@@ -1,0 +1,95 @@
+{
+  "cortex-debug.armToolchainPath": "C:\\Program Files\\Arm\\GNU Toolchain mingw-w64-x86_64-arm-none-eabi\\bin",
+  "cortex-debug.variableUseNaturalFormat": false,
+  "cmake.configureArgs": [
+    "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-toolchain.cmake"
+  ],
+  "cmake.generator": "Ninja",
+  "cmake.preferredGenerators": [
+    "Ninja"
+  ],
+  "betterStatusBar.defaultColor": "statusBar.foreground",
+  "betterStatusBar.reloadButton": "$(refresh)",
+  "betterStatusBar.commands": [
+    {
+      "id": "flash",
+      "label": "$(zap)",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Flash Firmware"
+      ],
+      "tooltip": "Flash target",
+      "priority": -2
+    },
+    {
+      "id": "cmake-config-debug",
+      "label": "$(bug) Debug",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Set build variant to Debug"
+      ],
+      "tooltip": "Generate the Cmake files for a debug build type",
+      "showButton": false
+    },
+    {
+      "id": "cmake-config-release",
+      "label": "Release",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Set build variant to Release"
+      ],
+      "showButton": false,
+    },
+    {
+      "id": "cmake-config-relwithdebinfo",
+      "label": "Release with Debug Info",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Set build variant to RelWithDebInfo"
+      ],
+      "showButton": false
+    },
+    {
+      "id": "cmake-config-minsizerel",
+      "label": "Minimise binary size",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Set build variant to MinSizeRel"
+      ],
+      "showButton": false
+    },
+    {
+      "id": "cmake-build",
+      "label": "$(tools)",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Build firmware"
+      ],
+      "tooltip": "Compile main.elf, compute binary size and compile .hex/.bin files",
+      "priority": -1
+    }
+  ],
+  "betterStatusBar.dropdowns": [
+    {
+      "id": "cmakeBuildTypeDropdown",
+      "label": "$(gear) Build type",
+      "commands": [
+        "cmake-config-release",
+        "cmake-config-debug",
+        "cmake-config-relwithdebinfo",
+        "cmake-config-minsizerel"
+      ],
+      "options": {
+        "placeholder": "Select a build variant",
+        "title": "CMake configuration"
+      },
+      "priority": 0
+    }
+  ]
+}
