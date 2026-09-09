@@ -1,13 +1,7 @@
 {
   "cortex-debug.armToolchainPath": "C:\\Program Files\\Arm\\GNU Toolchain mingw-w64-x86_64-arm-none-eabi\\bin",
   "cortex-debug.variableUseNaturalFormat": false,
-  "cmake.configureArgs": [
-    "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/arm-toolchain.cmake"
-  ],
-  "cmake.generator": "Ninja",
-  "cmake.preferredGenerators": [
-    "Ninja"
-  ],
+  
   "betterStatusBar.defaultColor": "statusBar.foreground",
   "betterStatusBar.reloadButton": "$(refresh)",
   "betterStatusBar.commands": [
