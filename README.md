@@ -83,6 +83,12 @@ A single 8-byte array (``snake_lightmap``) tracks the state of the entire screen
 
 This enables to only check the ``snake_lightmap[next_pos.Y] & (0b10000000U >> next_pos.X)`` value, instead of veriying all the positions between the tail and head indexes in the ``snake[64]`` array.
 
+### Hardware details
+#### Switches interrupts debouncing
+No debouncing mechanisms were implemented (RC filters or even software guards) because bounces were not an issue.
+#### Wiring diagram
+![Wiring diagram](docs/images/wiring_diagram.png)
+
 ### Improvements for the next version
 1. **Peripheral Drivers**: Implement dedicated drivers for **GPIO** and **SPI** peripherals to abstract direct register manipulations.
 2. **SPI Optimization**: Increase the **SPI** clock frequency to reduce game state rendering time, as the **MAX7219** supports speeds up to *10 MHz*.
