@@ -1,5 +1,6 @@
 #include "stm32f446ze.h"
 #include "utils.h"
+#include "nvic_helper.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -107,7 +108,6 @@ void move_snake(const Position new_pos, const bool eat_apple) {
 }
 
 void SPI3_Init() {
-  RCC_APB1ENR |= (1 << 15); // power SPI3 peripheral
 
   // PA4 : NSS pin
   GPIOA->MODER &= ~(0b11 << (2 * 4));   // clear PA4 mode reg
@@ -302,17 +302,16 @@ void Game_Init() {
 }
 
 void SysTick_Init() {
-  *STK_LOAD = 0x3E80;       // 16000 in hexadecimal -> 1 ms @ 16 MHz
-  *STK_VAL = 0x0;           // Clear current value
-  *STK_CTRL |= (0b1U << 0); // enable counter
-  *STK_CTRL |= (0b1U << 1); // enable SysTick exception request
-  *STK_CTRL |= (0b1U << 2); // use CPU clock (16MHz)
+  STK->LOAD = 0x3E80;       // 16000 in hexadecimal -> 1 ms @ 16 MHz
+  STK->VAL = 0x0;           // Clear current value
+  STK->CTRL |= (0b1U << 0); // enable counter
+  STK->CTRL |= (0b1U << 1); // enable SysTick exception request
+  STK->CTRL |= (0b1U << 2); // use CPU clock (16MHz)
 }
 
 void EXTI_Init() {
-  RCC_APB2ENR |= (1U << 14);               // enable SYS_CFG clock
-  *SYSCFG_EXTICR4 |= (0b0011U << (4 * 2)); // PD14 -> EXTI14
-  *SYSCFG_EXTICR4 |= (0b0011U << (4 * 3)); // PD15 -> EXTI15
+  SYSCFG->EXTICR4 |= (0b0011U << (4 * 2)); // PD14 -> EXTI14
+  SYSCFG->EXTICR4 |= (0b0011U << (4 * 3)); // PD15 -> EXTI15
 
   EXTI->RTSR |= (1U << 14); // Rising edge trigger on EXTI14
   EXTI->RTSR |= (1U << 15); // Rising edge trigger on EXTI15
@@ -320,10 +319,10 @@ void EXTI_Init() {
              (1U << 15); // clearing pending interrupts triggered during init
   EXTI->IMR |= (1U << 14) | (1U << 15); // enable EXTI14 and EXTI15
 
-  *NVIC_ISER1 |= (1 << (40 - 32)); // enable EXTI15_10
+  NVIC->ISER[1] |= (1 << (40 - 32)); // enable EXTI15_10
 
-  *SYSCFG_EXTICR2 &= ~(0b1111U << (4 * (6 - 4))); // PA6 -> EXTI6
-  *SYSCFG_EXTICR2 &= ~(0b1111U << (4 * (7 - 4))); // PA7 -> EXTI7
+  SYSCFG->EXTICR2 &= ~(0b1111U << (4 * (6 - 4))); // PA6 -> EXTI6
+  SYSCFG->EXTICR2 &= ~(0b1111U << (4 * (7 - 4))); // PA7 -> EXTI7
 
   EXTI->RTSR |= (1U << 6); // Rising edge trigger on EXTI6
   EXTI->RTSR |= (1U << 7); // Rising edge trigger on EXTI7
@@ -331,12 +330,12 @@ void EXTI_Init() {
              (1U << 7); // clearing pending interrupts triggered during init
   EXTI->IMR |= (1U << 6) | (1U << 7); // enable EXTI14 and EXTI15
 
-  *NVIC_ISER0 |= (1 << (23 - 0)); // enable EXTI9_5
+  NVIC->ISER[0] |= (1 << (23 - 0)); // enable EXTI9_5
 }
 
 void EXTI9_5_IRQHandler() {
   if (next_direction == NONE) {
-    appleRandomSeed = *STK_VAL;
+    appleRandomSeed = STK->VAL;
   }
   if ((EXTI->PR) & (1U << 6)) {
     next_direction = RIGHT; // PA6
@@ -350,7 +349,7 @@ void EXTI9_5_IRQHandler() {
 
 void EXTI15_10_IRQHandler() {
   if (next_direction == NONE) {
-    appleRandomSeed = *STK_VAL;
+    appleRandomSeed = STK->VAL;
   }
   if ((EXTI->PR) & (1U << 14)) {
     next_direction = DOWN;
@@ -372,9 +371,15 @@ void SysTick_Handler() {
   }
 }
 
+void RCC_Init() {
+  // enable GPIOA, GPIOB and GPIOD
+  RCC_AHB1ENR |= (1U << 0) | (1U << 1) | (1U << 3);
+  RCC_APB2ENR |= (1U << 14); // enable SYS_CFG clock
+  RCC_APB1ENR |= (1 << 15);  // power SPI3 peripheral
+}
+
 int main() {
-  RCC_AHB1ENR |=
-      (1U << 0) | (1U << 1) | (1U << 3); // enable GPIOA, GPIOB and GPIOD
+  RCC_Init();
 
   GPIOB->MODER |= (1 << (2 * LED1_PIN_NUMBER)) | (1 << (2 * LED2_PIN_NUMBER)) |
                   (1 << (2 * LED3_PIN_NUMBER));
@@ -392,7 +397,7 @@ int main() {
   GPIOA->PUPDR &= ~(0b1111U << (2 * 6));
   GPIOA->PUPDR |=
       ((0b10U << (2 * 6)) | (0b10U << (2 * 7))); // pull-down on PA6 and PA7
-
+  
   SysTick_Init();
   EXTI_Init();
   SPI3_Init();
@@ -417,14 +422,12 @@ int main() {
     }
 
     if (next_frame_flag) {
-      *NVIC_ICER0 |= (1U << (23 - 0));  // disable EXTI9_5
-      *NVIC_ICER1 |= (1U << (40 - 32)); // disable EXTI15_10
+      __disable_irq();
       GPIOB->ODR |= (1 << LED3_PIN_NUMBER);
       update_lightmap();
       GPIOB->ODR &= ~(1 << LED3_PIN_NUMBER);
       next_frame_flag = false;
-      *NVIC_ISER0 |= (1U << (23 - 0));  // enable EXTI9_5
-      *NVIC_ISER1 |= (1U << (40 - 32)); // enable EXTI15_10
+      __enable_irq();
     }
   }
   return 0;

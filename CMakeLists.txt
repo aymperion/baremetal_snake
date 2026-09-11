@@ -14,12 +14,15 @@ add_executable(${firmwareName}.elf)
 target_include_directories(${firmwareName}.elf
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/drivers/include
 )
 
 target_sources(${firmwareName}.elf
     PRIVATE
         src/main.c
         src/startup_stm32f446zetx.s
+        drivers/src/gpio_driver.c
+        drivers/src/exti_helper.c
 )
 
 target_compile_options(${firmwareName}.elf 
