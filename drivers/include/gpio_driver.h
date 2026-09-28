@@ -90,7 +90,7 @@ typedef struct {
   GPIO_AltFn_t Alternate_Func;
 } GPIO_Init_t;
 
-void GPIO_Init(GPIOx_RegDef_t *GPIOx, GPIO_Init_t *pGPIO_Init);
+void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init);
 
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx);
 

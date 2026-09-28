@@ -381,23 +381,22 @@ int main() {
   RCC_Enable_Clock_SYSCFG();
   RCC_Enable_Clock_SPI3();
 
-  GPIO_Init_t GPIO_init_struct = {0};
+  GPIO_Init(GPIOB, &(GPIO_Init_t){
+    .Pin = GPIO_PIN_14,
+    .Mode = GPIO_MODE_OUTPUT
+  });
 
-  GPIO_init_struct.Mode = GPIO_MODE_OUTPUT;
+  GPIO_Init(GPIOD, &(GPIO_Init_t){
+    .Pin = (GPIO_PIN_14 | GPIO_PIN_15),
+    .Mode = GPIO_MODE_ITR_RT,
+    .Pull = GPIO_PULL_DOWN
+  });
 
-  GPIO_init_struct.Pin = (GPIO_PIN_14);
-
-  GPIO_Init(GPIOB, &GPIO_init_struct);
-
-  GPIO_init_struct.Mode = GPIO_MODE_ITR_RT;
-  GPIO_init_struct.Pin = (GPIO_PIN_14 | GPIO_PIN_15);
-  GPIO_init_struct.Pull = GPIO_PULL_DOWN;
-
-  GPIO_Init(GPIOD, &GPIO_init_struct);
-
-  GPIO_init_struct.Pin = (GPIO_PIN_6 | GPIO_PIN_7);
-
-  GPIO_Init(GPIOA, &GPIO_init_struct);
+  GPIO_Init(GPIOA, &(GPIO_Init_t){
+    .Pin = (GPIO_PIN_6 | GPIO_PIN_7),
+    .Mode = GPIO_MODE_ITR_RT,
+    .Pull = GPIO_PULL_DOWN
+  });
 
   SysTick_Init();
   SPI3_Init();

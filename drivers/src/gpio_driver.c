@@ -3,7 +3,7 @@
 #include "rcc_helper.h"
 #include <stdint.h>
 
-void GPIO_Init(GPIOx_RegDef_t *GPIOx, GPIO_Init_t *pGPIO_Init) {
+void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init) {
   GPIO_PinMask_t pin_mask = pGPIO_Init->Pin;
   GPIO_Mode_t mode = pGPIO_Init->Mode;
   GPIO_Output_Type_t output_type = pGPIO_Init->Output_Type;
