@@ -3,39 +3,15 @@
 #include <stdint.h>
 
 void EXTI_SetConfig(EXTI_Config *Config) {
-  uint16_t line = Config->Line;
+  uint8_t line = Config->Line;
   uint8_t trigger = Config->Trigger;
 
-  switch (line) {
-  case 0:
-  case 1:
-  case 2:
-  case 3:
-    SYSCFG->EXTICR1 &= ~(0b1111U << (4 * line));
-    SYSCFG->EXTICR1 |= (Config->GPIOx << (4 * line));
-    break;
-  case 4:
-  case 5:
-  case 6:
-  case 7:
-    SYSCFG->EXTICR2 &= ~(0b1111U << (4 * (line - 4)));
-    SYSCFG->EXTICR2 |= (Config->GPIOx << (4 * (line - 4)));
-    break;
-  case 8:
-  case 9:
-  case 10:
-  case 11:
-    SYSCFG->EXTICR3 &= ~(0b1111U << (4 * (line - 8)));
-    SYSCFG->EXTICR3 |= (Config->GPIOx << (4 * (line - 8)));
-    break;
-  case 12:
-  case 13:
-  case 14:
-  case 15:
-    SYSCFG->EXTICR4 &= ~(0b1111U << (4 * (line - 12)));
-    SYSCFG->EXTICR4 |= (Config->GPIOx << (4 * (line - 12)));
-    break;
-  }
+  /* Configure SYSCFG EXTICR for line 0..15*/
+  uint8_t reg_idx = line >> 2U;              // line / 4 (EXTICR[0..3])
+  uint8_t bit_shift = (line & 0x03U) << 2U;  // (line % 4) * 4 bits
+
+  SYSCFG->EXTICR[reg_idx] &= ~(0x0FU << bit_shift);
+  SYSCFG->EXTICR[reg_idx] |= ((uint32_t)(Config->Port & 0x0FU) << bit_shift);
 
   EXTI->RTSR &= ~(0b1U << line);
   EXTI->FTSR &= ~(0b1U << line);
@@ -63,6 +39,6 @@ void EXTI_SetConfig(EXTI_Config *Config) {
 
 inline uint32_t EXTI_GetPending() { return EXTI->PR; }
 
-inline void EXTI_ClearPending(EXTI_Line Line) { EXTI->PR = (0b1U << Line); }
+inline void EXTI_ClearPending(uint8_t Line) { EXTI->PR = (0b1U << Line); }
 
-inline void EXTI_TriggerSoftwareIE(EXTI_Line Line) { EXTI->SWIER |= (0b1U << Line); }
+inline void EXTI_TriggerSoftwareIE(uint8_t Line) { EXTI->SWIER |= (0b1U << Line); }

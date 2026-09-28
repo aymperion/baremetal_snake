@@ -22,7 +22,7 @@ typedef enum {
     GPIO_PIN_13 = 0b0010000000000000U,
     GPIO_PIN_14 = 0b0100000000000000U,
     GPIO_PIN_15 = 0b1000000000000000U
-} GPIO_Pin_t;
+} GPIO_PinMask_t;
 
 typedef enum  {
     GPIO_PORT_A,
@@ -84,8 +84,7 @@ typedef enum {
 
 
 typedef struct {
-    GPIOx_RegDef_t* GPIOx;
-    GPIO_Pin_t Pin;
+    GPIO_PinMask_t Pin;
     GPIO_Mode_t Mode;
     GPIO_Output_Speed_t Output_Speed;
     GPIO_Output_Type_t Output_Type;
@@ -94,9 +93,9 @@ typedef struct {
 } GPIO_Init_t;
 
 void GPIO_ClockInit(uint8_t GPIO_Ports); //TODO
-void GPIO_Init(GPIO_Init_t* pGPIO_Handle);
+void GPIO_Init(GPIOx_RegDef_t* GPIOx, GPIO_Init_t* pGPIO_Init);
 
-void GPIO_DeInit(GPIO_Init_t* pGPIO_Handle); //TODO
+void GPIO_DeInit(GPIOx_RegDef_t* GPIOx, GPIO_Init_t* pGPIO_Init); //TODO
 
 bool GPIO_ReadPin(GPIOx_RegDef_t* GPIOx, uint8_t Pin_Number);
 

@@ -99,10 +99,15 @@ typedef struct {
 typedef struct {
   __IO uint32_t MEMRMP;
   __IO uint32_t PMC;
-  __IO uint32_t EXTICR1;
-  __IO uint32_t EXTICR2;
-  __IO uint32_t EXTICR3;
-  __IO uint32_t EXTICR4;
+  union {
+    __IO uint32_t EXTICR[4];
+    struct {
+    __IO uint32_t EXTICR1;
+    __IO uint32_t EXTICR2;
+    __IO uint32_t EXTICR3;
+    __IO uint32_t EXTICR4;
+    };
+  };
   uint32_t RESERVED1[2];
   __IO uint32_t CMPCR;
   uint32_t RESERVED2[2];
@@ -144,6 +149,9 @@ typedef struct {
 #define GPIOF_BASE 0x40021400
 #define GPIOG_BASE 0x40021800
 #define GPIOH_BASE 0x40021C00
+#define GPIO_PORT_TO_INDEX(GPIOx) ((uint8_t)(((uint32_t)(uintptr_t)(GPIOx) - GPIOA_BASE) >> 10U))
+
+#define RCC_BASE 0x40023800
 
 #define SPI3_BASE 0x40003C00
 

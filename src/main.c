@@ -1,6 +1,7 @@
 #include "stm32f446ze.h"
 #include "utils.h"
 #include "nvic_helper.h"
+#include "gpio_driver.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -381,25 +382,25 @@ void RCC_Init() {
 int main() {
   RCC_Init();
 
-  GPIOB->MODER |= (1 << (2 * LED1_PIN_NUMBER)) | (1 << (2 * LED2_PIN_NUMBER)) |
-                  (1 << (2 * LED3_PIN_NUMBER));
+  GPIO_Init_t GPIO_init_struct = {0};
 
-  GPIOD->MODER &=
-      ~((0b11U << (2 * 14)) | (0b11U << (2 * 15))); // PD14 and PD15 are inputs
+  GPIO_init_struct.Mode = GPIO_MODE_OUTPUT;
 
-  GPIOD->PUPDR &= ~(0b1111U << (2 * 14));
-  GPIOD->PUPDR |=
-      ((0b10U << (2 * 14)) | (0b10U << (2 * 15))); // pull-down on PD14 and PD15
+  GPIO_init_struct.Pin = (GPIO_PIN_14);
 
-  GPIOA->MODER &=
-      ~((0b11U << (2 * 6)) | (0b11U << (2 * 7))); // PA6 and PA7 are inputs
+  GPIO_Init(GPIOB, &GPIO_init_struct);
 
-  GPIOA->PUPDR &= ~(0b1111U << (2 * 6));
-  GPIOA->PUPDR |=
-      ((0b10U << (2 * 6)) | (0b10U << (2 * 7))); // pull-down on PA6 and PA7
+  GPIO_init_struct.Mode = GPIO_MODE_ITR_RT;
+  GPIO_init_struct.Pin = (GPIO_PIN_14 | GPIO_PIN_15);
+  GPIO_init_struct.Pull = GPIO_PULL_DOWN;
+
+  GPIO_Init(GPIOD, &GPIO_init_struct);
+
+  GPIO_init_struct.Pin = (GPIO_PIN_6 | GPIO_PIN_7);
+
+  GPIO_Init(GPIOA, &GPIO_init_struct);
   
   SysTick_Init();
-  EXTI_Init();
   SPI3_Init();
   Game_Init();
 
@@ -423,9 +424,9 @@ int main() {
 
     if (next_frame_flag) {
       __disable_irq();
-      GPIOB->ODR |= (1 << LED3_PIN_NUMBER);
+      GPIO_SetPin(GPIOB, LED3_PIN_NUMBER);
       update_lightmap();
-      GPIOB->ODR &= ~(1 << LED3_PIN_NUMBER);
+      GPIO_ClearPin(GPIOB, LED3_PIN_NUMBER);
       next_frame_flag = false;
       __enable_irq();
     }
