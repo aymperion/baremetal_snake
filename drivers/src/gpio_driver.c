@@ -1,5 +1,6 @@
 #include "exti_helper.h"
 #include "gpio_driver.h"
+#include "rcc_helper.h"
 #include <stdint.h>
 
 void GPIO_Init(GPIOx_RegDef_t *GPIOx, GPIO_Init_t *pGPIO_Init) {
@@ -59,6 +60,8 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, GPIO_Init_t *pGPIO_Init) {
     }
   }
 }
+
+void GPIO_DeInit(GPIOx_RegDef_t *GPIOx) { RCC_Enable_Clock_GPIOx(GPIOx); }
 
 bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
   return ((GPIOx->IDR >> Pin_Number) & 0b1U);

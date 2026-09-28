@@ -23,6 +23,7 @@ target_sources(${firmwareName}.elf
         src/startup_stm32f446zetx.s
         drivers/src/gpio_driver.c
         drivers/src/exti_helper.c
+        drivers/src/rcc_helper.c
 )
 
 target_compile_options(${firmwareName}.elf 

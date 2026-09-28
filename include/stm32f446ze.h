@@ -69,6 +69,43 @@ typedef struct {
 } GPIOx_RegDef_t;
 
 typedef struct {
+  __IO uint32_t CR;
+  __IO uint32_t PLLCFGR;
+  __IO uint32_t CFGR;
+  __IO uint32_t CIR;
+  __IO uint32_t AHB1RSTR;
+  __IO uint32_t AHB2RSTR;
+  __IO uint32_t AHB3RSTR;
+  __I uint32_t RESERVED1;
+  __IO uint32_t APB1RSTR;
+  __IO uint32_t APB2RSTR;
+  __I uint32_t RESERVED2[2];
+  __IO uint32_t AHB1ENR;
+  __IO uint32_t AHB2ENR;
+  __IO uint32_t AHB3ENR;
+  __I uint32_t RESERVED3;
+  __IO uint32_t APB1ENR;
+  __IO uint32_t APB2ENR;
+  __I uint32_t RESERVED4[2];
+  __IO uint32_t AHB1LPENR;
+  __IO uint32_t AHB2LPENR;
+  __IO uint32_t AHB3LPENR;
+  __I uint32_t RESERVED5;
+  __IO uint32_t APB1LPENR;
+  __IO uint32_t APB2LPENR;
+  __I uint32_t RESERVED6[2];
+  __IO uint32_t BDCR;
+  __IO uint32_t CSR;
+  __I uint32_t RESERVED7[2];
+  __IO uint32_t SSCGR;
+  __IO uint32_t PLLI2SCFGR;
+  __IO uint32_t PLLSAICFGR;
+  __IO uint32_t DCKCFGR;
+  __IO uint32_t CKGATENR;
+  __IO uint32_t DCKCFGR2;
+} RCC_RegDef_t;
+
+typedef struct {
   __IO uint16_t CR1;
   uint16_t : 16;
 
@@ -82,7 +119,7 @@ typedef struct {
   uint16_t : 16;
 
   __IO uint16_t CRCPR;
-  uint16_t  : 16;
+  uint16_t : 16;
 
   __I uint16_t RXCRCR;
   uint16_t : 16;
@@ -102,10 +139,10 @@ typedef struct {
   union {
     __IO uint32_t EXTICR[4];
     struct {
-    __IO uint32_t EXTICR1;
-    __IO uint32_t EXTICR2;
-    __IO uint32_t EXTICR3;
-    __IO uint32_t EXTICR4;
+      __IO uint32_t EXTICR1;
+      __IO uint32_t EXTICR2;
+      __IO uint32_t EXTICR3;
+      __IO uint32_t EXTICR4;
     };
   };
   uint32_t RESERVED1[2];
@@ -127,7 +164,7 @@ typedef struct {
 /*
   Core peripherals adresses
 */
-#define STK_BASE  0xE000E010
+#define STK_BASE 0xE000E010
 #define NVIC_BASE 0xE000E100
 
 /*
@@ -149,7 +186,8 @@ typedef struct {
 #define GPIOF_BASE 0x40021400
 #define GPIOG_BASE 0x40021800
 #define GPIOH_BASE 0x40021C00
-#define GPIO_PORT_TO_INDEX(GPIOx) ((uint8_t)(((uint32_t)(uintptr_t)(GPIOx) - GPIOA_BASE) >> 10U))
+#define GPIO_PORT_TO_INDEX(GPIOx)                                              \
+  ((uint8_t)(((uint32_t)(uintptr_t)(GPIOx) - GPIOA_BASE) >> 10U))
 
 #define RCC_BASE 0x40023800
 
@@ -161,8 +199,8 @@ typedef struct {
   Core peripherals definition
 */
 
-  #define STK ((STK_RegDef_t *)(STK_BASE))
-  #define NVIC ((NVIC_RegDef_t *)NVIC_BASE)
+#define STK ((STK_RegDef_t *)(STK_BASE))
+#define NVIC ((NVIC_RegDef_t *)NVIC_BASE)
 /*
   Chip peripherals definition
 */
@@ -178,9 +216,7 @@ typedef struct {
 
 #define SYSCFG ((SYSCFG_RegDef_t *)SYSCFG_BASE)
 
-#define RCC_AHB1ENR (*(volatile uint32_t *)(RCC_BASE + RCC_AHB1ENR_OFFSET))
-#define RCC_APB1ENR (*(volatile uint32_t *)(RCC_BASE + RCC_APB1ENR_OFFSET))
-#define RCC_APB2ENR (*(volatile uint32_t *)(RCC_BASE + RCC_APB2ENR_OFFSET))
+#define RCC ((RCC_RegDef_t *)RCC_BASE)
 
 #define EXTI ((EXTI_RegDef_t *)EXTI_BASE)
 

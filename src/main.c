@@ -1,7 +1,9 @@
+#include "gpio_driver.h"
+#include "nvic_helper.h"
+#include "rcc_helper.h"
 #include "stm32f446ze.h"
 #include "utils.h"
-#include "nvic_helper.h"
-#include "gpio_driver.h"
+
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -372,15 +374,12 @@ void SysTick_Handler() {
   }
 }
 
-void RCC_Init() {
-  // enable GPIOA, GPIOB and GPIOD
-  RCC_AHB1ENR |= (1U << 0) | (1U << 1) | (1U << 3);
-  RCC_APB2ENR |= (1U << 14); // enable SYS_CFG clock
-  RCC_APB1ENR |= (1 << 15);  // power SPI3 peripheral
-}
-
 int main() {
-  RCC_Init();
+  RCC_Enable_Clock_GPIOx(GPIOA);
+  RCC_Enable_Clock_GPIOx(GPIOB);
+  RCC_Enable_Clock_GPIOx(GPIOD);
+  RCC_Enable_Clock_SYSCFG();
+  RCC_Enable_Clock_SPI3();
 
   GPIO_Init_t GPIO_init_struct = {0};
 
@@ -399,7 +398,7 @@ int main() {
   GPIO_init_struct.Pin = (GPIO_PIN_6 | GPIO_PIN_7);
 
   GPIO_Init(GPIOA, &GPIO_init_struct);
-  
+
   SysTick_Init();
   SPI3_Init();
   Game_Init();
