@@ -48,12 +48,12 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, GPIO_Init_t *pGPIO_Init) {
       GPIOx->PUPDR &= ~(0b11 << (2 * pin_idx));
       GPIOx->PUPDR |= (pull << (2 * pin_idx));
 
-      GPIOx->AFRL &= ~(0b1111U << (4 * pin_idx));
-      GPIOx->AFRH &= ~(0b1111U << (4 * pin_idx));
       if (mode == GPIO_MODE_ALTFN) {
         if (pin_idx < 8) {
+          GPIOx->AFRL &= ~(0b1111U << (4 * pin_idx));
           GPIOx->AFRL |= (alt_func << (4 * pin_idx));
         } else {
+          GPIOx->AFRH &= ~(0b1111U << (4 * (pin_idx - 8)));
           GPIOx->AFRH |= (alt_func << (4 * (pin_idx - 8)));
         }
       }
