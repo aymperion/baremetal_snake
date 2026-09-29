@@ -83,6 +83,26 @@ typedef struct {
 
 void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init);
 
+static inline void GPIO_Config_Output(GPIOx_RegDef_t *GPIOx, uint8_t pin) {
+  if (pin > 15) {
+    return;
+  }
+  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin = (1U << pin),
+                                  .Mode = GPIO_MODE_OUTPUT,
+                                  .Output_Type = GPIO_OTYPE_PUSHPULL,
+                                  .Output_Speed = GPIO_OSPEED_LOW});
+}
+
+static inline void GPIO_Config_Input(GPIOx_RegDef_t *GPIOx, uint8_t pin,
+                                     GPIO_Pull_t pull) {
+  if (pin > 15) {
+    return;
+  }
+  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin = (1U << pin),
+                                  .Mode = GPIO_MODE_INPUT,
+                                  .Pull = pull});
+}
+
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx);
 
 bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
