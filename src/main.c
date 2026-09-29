@@ -383,18 +383,18 @@ int main() {
   RCC_Enable_Clock_SPI3();
 
   GPIO_Init(GPIOB, &(GPIO_Init_t){
-    .Pin = GPIO_PIN_14,
+    .Pin_Mask = GPIO_PIN_14,
     .Mode = GPIO_MODE_OUTPUT
   });
 
   GPIO_Init(GPIOD, &(GPIO_Init_t){
-    .Pin = (GPIO_PIN_14 | GPIO_PIN_15),
+    .Pin_Mask = (GPIO_PIN_14 | GPIO_PIN_15),
     .Mode = GPIO_MODE_ITR_RT,
     .Pull = GPIO_PULL_DOWN
   });
 
   GPIO_Init(GPIOA, &(GPIO_Init_t){
-    .Pin = (GPIO_PIN_6 | GPIO_PIN_7),
+    .Pin_Mask = (GPIO_PIN_6 | GPIO_PIN_7),
     .Mode = GPIO_MODE_ITR_RT,
     .Pull = GPIO_PULL_DOWN
   });

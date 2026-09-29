@@ -73,7 +73,7 @@ enum {
 };
 
 typedef struct {
-  GPIO_PinMask_t Pin;
+  GPIO_PinMask_t Pin_Mask;
   GPIO_Mode_t Mode;
   GPIO_Output_Speed_t Output_Speed;
   GPIO_Output_Type_t Output_Type;
@@ -87,7 +87,7 @@ static inline void GPIO_Config_Output(GPIOx_RegDef_t *GPIOx, uint8_t pin) {
   if (pin > 15) {
     return;
   }
-  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin = (1U << pin),
+  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin_Mask = (1U << pin),
                                   .Mode = GPIO_MODE_OUTPUT,
                                   .Output_Type = GPIO_OTYPE_PUSHPULL,
                                   .Output_Speed = GPIO_OSPEED_LOW});
@@ -98,7 +98,7 @@ static inline void GPIO_Config_Input(GPIOx_RegDef_t *GPIOx, uint8_t pin,
   if (pin > 15) {
     return;
   }
-  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin = (1U << pin),
+  GPIO_Init(GPIOx, &(GPIO_Init_t){.Pin_Mask = (1U << pin),
                                   .Mode = GPIO_MODE_INPUT,
                                   .Pull = pull});
 }
