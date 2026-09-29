@@ -425,9 +425,9 @@ int main() {
 
     if (next_frame_flag) {
       __disable_irq();
-      GPIO_SetPin(GPIOB, LED3_PIN);
+      GPIO_TogglePin(GPIOB, LED3_PIN);
       update_lightmap();
-      GPIO_ClearPin(GPIOB, LED3_PIN);
+      GPIO_TogglePin(GPIOB, LED3_PIN);
       next_frame_flag = false;
       __enable_irq();
     }

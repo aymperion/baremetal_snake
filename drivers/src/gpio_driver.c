@@ -84,11 +84,8 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init) {
 
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx) { RCC_Reset_GPIOx(GPIOx); }
 
-bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
-  if (Pin_Number > 15) {
-    return false;
-  }
-  return ((GPIOx->IDR >> Pin_Number) & 0b1U);
+bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
+  return (GPIOx->IDR & Pin_Mask) != 0;
 }
 
 void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
@@ -99,16 +96,18 @@ void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
   GPIOx->BSRR = (uint32_t)(Pin_Mask << 16);
 }
 
-void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
-  if (Pin_Number > 15) {
-    return;
-  }
+void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
   uint32_t odr = GPIOx->ODR;
-  if (odr & (1U << Pin_Number)) {
-    GPIOx->BSRR = (1U << (16 + Pin_Number));
-  } else {
-    GPIOx->BSRR = (1U << Pin_Number);
-  }
+  uint32_t mask = 0;
+
+  /* For pins currently SET: write 1 to BRx (bits [31:16]) to reset them */
+  mask |= (((uint32_t)(odr & Pin_Mask)) << 16U);
+
+  /* For pins currently CLEARED: write 1 to BSx (bits [15:0]) to set them.
+   * Note: BSx and BRx bits are mutually exclusive, preventing any priority conflict. */
+  mask |= (~odr & Pin_Mask);
+
+  GPIOx->BSRR = mask;
 }
 
 void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pins_to_lock) {

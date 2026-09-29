@@ -105,13 +105,13 @@ static inline void GPIO_Config_Input(GPIOx_RegDef_t *GPIOx, uint8_t pin,
 
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx);
 
-bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
+bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
 void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
 void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
-void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
+void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
 void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pins_to_lock);
 
