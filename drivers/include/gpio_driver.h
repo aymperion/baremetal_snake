@@ -4,8 +4,9 @@
 #ifndef _GPIO_DRIVER_H_
 #define _GPIO_DRIVER_H_
 
+typedef uint16_t GPIO_PinMask_t;
 /* clang-format off */
-typedef enum {
+enum {
   GPIO_PIN_0  = 0b0000000000000001U,
   GPIO_PIN_1  = 0b0000000000000010U,
   GPIO_PIN_2  = 0b0000000000000100U,
@@ -21,11 +22,13 @@ typedef enum {
   GPIO_PIN_12 = 0b0001000000000000U,
   GPIO_PIN_13 = 0b0010000000000000U,
   GPIO_PIN_14 = 0b0100000000000000U,
-  GPIO_PIN_15 = 0b1000000000000000U
-} GPIO_PinMask_t;
+  GPIO_PIN_15 = 0b1000000000000000U,
+  GPIO_PIN_ALL = 0xFFFFU
+};
 /* clang-format on */
 
-typedef enum {
+typedef uint8_t GPIO_Mode_t;
+enum {
   GPIO_MODE_INPUT,
   GPIO_MODE_OUTPUT,
   GPIO_MODE_ALTFN,
@@ -33,24 +36,24 @@ typedef enum {
   GPIO_MODE_ITR_RT,
   GPIO_MODE_ITR_FT,
   GPIO_MODE_ITR_RFT
-} GPIO_Mode_t;
+};
 
-typedef enum { GPIO_OTYPE_PUSHPULL, GPIO_OTYPE_OPENDRAIN } GPIO_Output_Type_t;
+typedef uint8_t GPIO_Output_Type_t;
+enum { GPIO_OTYPE_PUSHPULL, GPIO_OTYPE_OPENDRAIN };
 
-typedef enum {
+typedef uint8_t GPIO_Output_Speed_t;
+enum {
   GPIO_OSPEED_LOW,
   GPIO_OSPEED_MEDIUM,
   GPIO_OSPEED_FAST,
   GPIO_OSPEED_HIGH
-} GPIO_Output_Speed_t;
+};
 
-typedef enum {
-  GPIO_PULL_NONE,
-  GPIO_PULL_UP,
-  GPIO_PULL_DOWN,
-} GPIO_Pull_t;
+typedef uint8_t GPIO_Pull_t;
+enum { GPIO_PULL_NONE, GPIO_PULL_UP, GPIO_PULL_DOWN };
 
-typedef enum {
+typedef uint8_t GPIO_AltFn_t;
+enum {
   GPIO_ALTFN_0,
   GPIO_ALTFN_1,
   GPIO_ALTFN_2,
@@ -66,8 +69,8 @@ typedef enum {
   GPIO_ALTFN_12,
   GPIO_ALTFN_13,
   GPIO_ALTFN_14,
-  GPIO_ALTFN_15,
-} GPIO_AltFn_t;
+  GPIO_ALTFN_15
+};
 
 typedef struct {
   GPIO_PinMask_t Pin;
@@ -84,14 +87,12 @@ void GPIO_DeInit(GPIOx_RegDef_t *GPIOx);
 
 bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
 
-void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
+void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
-void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
+void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask);
 
 void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number);
 
-void GPIO_WritePort(GPIOx_RegDef_t *GPIOx, uint16_t Value);
-
-void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, uint16_t Pin_States);
+void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pins_to_lock);
 
 #endif // _GPIO_DRIVER_H_

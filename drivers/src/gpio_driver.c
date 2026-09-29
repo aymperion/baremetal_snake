@@ -64,31 +64,38 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init) {
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx) { RCC_Reset_GPIOx(GPIOx); }
 
 bool GPIO_ReadPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
+  if (Pin_Number > 15) {
+    return false;
+  }
   return ((GPIOx->IDR >> Pin_Number) & 0b1U);
 }
 
-void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
-  GPIOx->BSRR = (0b1U << Pin_Number);
+void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
+  GPIOx->BSRR = Pin_Mask;
 }
 
-void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
-  GPIOx->BSRR = (0b1U << (16 + Pin_Number));
+void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
+  GPIOx->BSRR = (uint32_t)(Pin_Mask << 16);
 }
 
 void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, uint8_t Pin_Number) {
-  GPIOx->ODR ^= (0b1U << Pin_Number);
+  if (Pin_Number > 15) {
+    return;
+  }
+  uint32_t odr = GPIOx->ODR;
+  if (odr & (1U << Pin_Number)) {
+    GPIOx->BSRR = (1U << (16 + Pin_Number));
+  } else {
+    GPIOx->BSRR = (1U << Pin_Number);
+  }
 }
 
-void GPIO_WritePort(GPIOx_RegDef_t *GPIOx, uint16_t Value) {
-  GPIOx->ODR = Value;
-}
+void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pins_to_lock) {
+  uint32_t temp = (1U << 16) | Pins_to_lock;
 
-void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, uint16_t Pin_States) {
-  uint32_t temp = (1U << 16) | Pin_States;
-
-  GPIOx->LCKR = temp;       // WR LCKR[16] = '1' + LCKR[15:0]
-  GPIOx->LCKR = Pin_States; // WR LCKR[16] = '0' + LCKR[15:0]
-  GPIOx->LCKR = temp;       // WR LCKR[16] = '1' + LCKR[15:0]
+  GPIOx->LCKR = temp;         // WR LCKR[16] = '1' + LCKR[15:0]
+  GPIOx->LCKR = Pins_to_lock; // WR LCKR[16] = '0' + LCKR[15:0]
+  GPIOx->LCKR = temp;         // WR LCKR[16] = '1' + LCKR[15:0]
 
   temp = GPIOx->LCKR; // RD LCKR
 }

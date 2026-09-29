@@ -11,9 +11,9 @@
 
 #define MSEC_PER_FRAME 300
 #define APPLE_TOGGLE_RATE 100
-#define LED1_PIN_NUMBER 0
-#define LED2_PIN_NUMBER 7
-#define LED3_PIN_NUMBER 14
+#define LED1_PIN GPIO_PIN_0
+#define LED2_PIN GPIO_PIN_7
+#define LED3_PIN GPIO_PIN_14
 
 void _init() {
   // stub
@@ -422,9 +422,9 @@ int main() {
 
     if (next_frame_flag) {
       __disable_irq();
-      GPIO_SetPin(GPIOB, LED3_PIN_NUMBER);
+      GPIO_SetPin(GPIOB, LED3_PIN);
       update_lightmap();
-      GPIO_ClearPin(GPIOB, LED3_PIN_NUMBER);
+      GPIO_ClearPin(GPIOB, LED3_PIN);
       next_frame_flag = false;
       __enable_irq();
     }
