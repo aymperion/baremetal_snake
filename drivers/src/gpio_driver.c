@@ -11,17 +11,24 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init) {
   GPIO_Pull_t pull = pGPIO_Init->Pull;
   GPIO_AltFn_t alt_func = pGPIO_Init->Alternate_Func;
 
+  uint32_t moder = GPIOx->MODER;
+  uint32_t otyper = GPIOx->OTYPER;
+  uint32_t ospeedr = GPIOx->OSPEEDR;
+  uint32_t pupdr = GPIOx->PUPDR;
+  uint32_t afrl = GPIOx->AFRL;
+  uint32_t afrh = GPIOx->AFRH;
+
   for (int pin_idx = 0; pin_idx < 16; pin_idx++) {
     if (pin_mask & (0b1U << pin_idx)) {
 
-      GPIOx->MODER &= ~(0b11U << (2 * pin_idx));
+      moder &= ~(0b11U << (2 * pin_idx));
 
       if (mode <= GPIO_MODE_ANALOG) {
-        GPIOx->MODER |= (mode << (2 * pin_idx));
+        moder |= (mode << (2 * pin_idx));
 
       } else {
         // input mode for interrupts
-        GPIOx->MODER |= (GPIO_MODE_INPUT << (2 * pin_idx));
+        moder |= (GPIO_MODE_INPUT << (2 * pin_idx));
 
         EXTI_Config exti_config;
         exti_config.Mode = EXTI_MODE_INTERRUPT;
@@ -39,26 +46,40 @@ void GPIO_Init(GPIOx_RegDef_t *GPIOx, const GPIO_Init_t *pGPIO_Init) {
         EXTI_SetConfig(&exti_config);
       }
 
-      GPIOx->OTYPER &= ~(0b1U << pin_idx);
-      GPIOx->OTYPER |= (output_type << pin_idx);
+      otyper &= ~(0b1U << pin_idx);
+      otyper |= (output_type << pin_idx);
 
-      GPIOx->OSPEEDR &= ~(0b11 << (2 * pin_idx));
-      GPIOx->OSPEEDR |= (output_speed << (2 * pin_idx));
+      ospeedr &= ~(0b11U << (2 * pin_idx));
+      ospeedr |= (output_speed << (2 * pin_idx));
 
-      GPIOx->PUPDR &= ~(0b11 << (2 * pin_idx));
-      GPIOx->PUPDR |= (pull << (2 * pin_idx));
+      pupdr &= ~(0b11U << (2 * pin_idx));
+      pupdr |= (pull << (2 * pin_idx));
 
       if (mode == GPIO_MODE_ALTFN) {
         if (pin_idx < 8) {
-          GPIOx->AFRL &= ~(0b1111U << (4 * pin_idx));
-          GPIOx->AFRL |= (alt_func << (4 * pin_idx));
+          afrl &= ~(0b1111U << (4 * pin_idx));
+          afrl |= (alt_func << (4 * pin_idx));
         } else {
-          GPIOx->AFRH &= ~(0b1111U << (4 * (pin_idx - 8)));
-          GPIOx->AFRH |= (alt_func << (4 * (pin_idx - 8)));
+          uint8_t shift = 4 * (pin_idx - 8);
+          afrh &= ~(0b1111U << shift);
+          afrh |= (alt_func << shift);
         }
       }
     }
   }
+
+  // Write once to hardware registers
+  GPIOx->OTYPER = otyper;
+  GPIOx->OSPEEDR = ospeedr;
+  GPIOx->PUPDR = pupdr;
+  if (mode == GPIO_MODE_ALTFN) {
+    GPIOx->AFRL = afrl;
+    GPIOx->AFRH = afrh;
+  }
+  /* Apply MODER last to prevent transient glitches: all electrical
+   * characteristics (type, speed, pull, alternate function) must be set before
+   * driving the pad. */
+  GPIOx->MODER = moder;
 }
 
 void GPIO_DeInit(GPIOx_RegDef_t *GPIOx) { RCC_Reset_GPIOx(GPIOx); }
