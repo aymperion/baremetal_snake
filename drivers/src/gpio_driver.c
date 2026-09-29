@@ -93,7 +93,7 @@ void GPIO_SetPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
 }
 
 void GPIO_ClearPin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
-  GPIOx->BSRR = (uint32_t)(Pin_Mask << 16);
+  GPIOx->BSRR = ((uint32_t)Pin_Mask) << 16;
 }
 
 void GPIO_TogglePin(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pin_Mask) {
