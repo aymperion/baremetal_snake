@@ -117,5 +117,5 @@ void GPIO_LockPort(GPIOx_RegDef_t *GPIOx, GPIO_PinMask_t Pins_to_lock) {
   GPIOx->LCKR = Pins_to_lock; // WR LCKR[16] = '0' + LCKR[15:0]
   GPIOx->LCKR = temp;         // WR LCKR[16] = '1' + LCKR[15:0]
 
-  temp = GPIOx->LCKR; // RD LCKR
+  (void)GPIOx->LCKR; // RD LCKR
 }
