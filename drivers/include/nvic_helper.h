@@ -15,42 +15,16 @@
 #define EXTI9_5_IRQn 23
 #define EXTI15_10_IRQn 40
 
-/* clang-format off */
-static const uint8_t EXTI_IRQ_TABLE[16] = {
-    EXTI0_IRQn, 
-    EXTI1_IRQn, 
-    EXTI2_IRQn,
-    EXTI3_IRQn,
-    EXTI4_IRQn,
-
-    EXTI9_5_IRQn, 
-    EXTI9_5_IRQn, 
-    EXTI9_5_IRQn, 
-    EXTI9_5_IRQn, 
-    EXTI9_5_IRQn,
-    
-    EXTI15_10_IRQn, 
-    EXTI15_10_IRQn, 
-    EXTI15_10_IRQn, 
-    EXTI15_10_IRQn, 
-    EXTI15_10_IRQn, 
-    EXTI15_10_IRQn 
-};
-/* clang-format on */
-
-
-static inline void NVIC_Enable_EXTIx(uint8_t Line) {
-  uint8_t irqn = EXTI_IRQ_TABLE[Line];
+static inline void NVIC_EnableIRQ(uint8_t irqn) {
   // x >> 5 : integer part of x / 32
   // x & 0x1F (0b00011111, 31) : x % 32
-  NVIC->ISER[irqn >> 5] |= (1UL << (irqn & 0x1F));
+  NVIC->ISER[irqn >> 5] = (1UL << (irqn & 0x1F));
 }
 
-static inline void NVIC_Disable_EXTIx(uint8_t Line) {
-  uint8_t irqn = EXTI_IRQ_TABLE[Line];
+static inline void NVIC_DisableIRQ(uint8_t irqn) {
   // x >> 5 : integer part of x / 32
   // x & 0x1F (0b00011111, 31) : x % 32
-  NVIC->ICER[irqn >> 5] |= (1UL << (irqn & 0x1F));
+  NVIC->ICER[irqn >> 5] = (1UL << (irqn & 0x1F));
 }
 
 #endif // _NVIC_HELPER_H_

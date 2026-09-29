@@ -23,10 +23,12 @@ typedef struct {
     EXTI_Mode Mode;
 } EXTI_Config;
 
-void EXTI_ClockInit(); // TODO
 void EXTI_SetConfig(EXTI_Config* Config);
 uint32_t EXTI_GetPending();
 void EXTI_ClearPending(uint8_t Line);
 void EXTI_TriggerSoftwareIE(uint8_t Line);
+
+void EXTI_EnableNVIC(void);
+void EXTI_DisableNVIC(void);
 
 #endif // _EXTI_DRIVER_H_

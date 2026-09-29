@@ -1,3 +1,4 @@
+#include "exti_helper.h"
 #include "gpio_driver.h"
 #include "nvic_helper.h"
 #include "rcc_helper.h"
@@ -397,6 +398,8 @@ int main() {
     .Mode = GPIO_MODE_ITR_RT,
     .Pull = GPIO_PULL_DOWN
   });
+
+  EXTI_EnableNVIC();
 
   SysTick_Init();
   SPI3_Init();
