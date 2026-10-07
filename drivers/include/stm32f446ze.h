@@ -1,6 +1,4 @@
-#include <stdbool.h>
 #include <stdint.h>
-#include <sys/types.h>
 
 #ifndef _STM32F446ZE_H_
 #define _STM32F446ZE_H_
@@ -109,10 +107,10 @@ typedef struct {
   __IO uint16_t CR1;
   uint16_t : 16;
 
-  __IO u_int16_t CR2;
+  __IO uint16_t CR2;
   uint16_t : 16;
 
-  __I u_int16_t SR;
+  __I uint16_t SR;
   uint16_t : 16;
 
   __IO uint16_t DR;
