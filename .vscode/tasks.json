@@ -12,30 +12,43 @@
         {
             "label": "Flash Firmware",
             "type": "shell",
-            "command": "openocd -f board/st_nucleo_f4.cfg -c \"program build/main.hex verify reset exit\"",
-            "problemMatcher": [
-                "$gcc"
-            ]
+            "command": "\"${workspaceFolder}/.venv/Scripts/python.exe\" scripts/flash.py"
         },
         {
-            "label": "Set build variant to Debug",
+            "label": "Enable semihosting",
             "type": "shell",
-            "command": "cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -DCMAKE_BUILD_TYPE=Debug"
+            "command": "openocd -f board/st_nucleo_f4.cfg -c \"init; arm semihosting enable;\"",
+            "problemMatcher": []
         },
         {
-            "label": "Set build variant to Release",
+            "label": "Configure : production (Release)",
             "type": "shell",
-            "command": "cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -DCMAKE_BUILD_TYPE=Release"
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=production -DCMAKE_BUILD_TYPE=Release"
         },
         {
-            "label": "Set build variant to RelWithDebInfo",
+            "label": "Configure : production (Debug)",
             "type": "shell",
-            "command": "cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=production -DCMAKE_BUILD_TYPE=Debug"
         },
         {
-            "label": "Set build variant to MinSizeRel",
+            "label": "Configure : production (RelWithDebInfo)",
             "type": "shell",
-            "command": "cmake -B build -S . -G Ninja -DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake -DCMAKE_BUILD_TYPE=MinSizeRel"
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=production -DCMAKE_BUILD_TYPE=RelWithDebInfo"
+        },
+        {
+            "label": "Configure : production (MinSizeRel)",
+            "type": "shell",
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=production -DCMAKE_BUILD_TYPE=MinSizeRel"
+        },
+        {
+            "label": "Configure : test (Release)",
+            "type": "shell",
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=test -DCMAKE_BUILD_TYPE=Release"
+        },
+        {
+            "label": "Configure : test (Debug)",
+            "type": "shell",
+            "command": "cmake -B build -S . -G Ninja \"-DCMAKE_TOOLCHAIN_FILE=arm-toolchain.cmake\" -DTARGET_GROUP=test -DCMAKE_BUILD_TYPE=Debug"
         },
         {
             "label": "Build firmware",
@@ -44,8 +57,10 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
-            
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
         }
     ]
 }
