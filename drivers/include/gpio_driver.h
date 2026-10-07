@@ -1,5 +1,6 @@
 #include "stm32f446ze.h"
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifndef _GPIO_DRIVER_H_
 #define _GPIO_DRIVER_H_
