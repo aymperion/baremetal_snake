@@ -3,7 +3,9 @@
 #include "gpio_driver.h"
 #include "nvic_helper.h"
 #include "rcc_helper.h"
+#include "stm32f446ze.h"
 #include "unity.h"
+#include "unity_internals.h"
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -307,7 +309,32 @@ void test_decoupled_EXTI_interrupt_both_trigger(void) {
   TEST_ASSERT_FALSE((EXTI_GetPending() & (1U << TEST_GPIO_PIN_B_INDEX)) != 0);
 }
 
+void test_decoupled_GPIO_LockPort() {
+
+  RCC_Enable_Clock_GPIOx(TEST_GPIO_PORT_B);
+  GPIO_Init(TEST_GPIO_PORT_B, &(GPIO_Init_t){
+    .Pin_Mask = GPIO_PIN_0 | GPIO_PIN_7 | GPIO_PIN_15,
+    .Mode = GPIO_MODE_INPUT,
+    .Pull = GPIO_PULL_DOWN
+  });
+
+  GPIO_LockPort(TEST_GPIO_PORT_B, GPIO_PIN_0 | GPIO_PIN_15);
+
+  // Trying to modify the GPIO Mode of a locked pin should have no effect
+  TEST_GPIO_PORT_B->MODER |= (1U << (2 * 0));
+  TEST_ASSERT_EQUAL_HEX32(0U, TEST_GPIO_PORT_B->MODER & (0b11U << (2 * 0)));
+
+  // Trying to modify the GPIO Mode of a locked pin should have no effect
+  TEST_GPIO_PORT_B->MODER |= (1U << (2 * 15));
+  TEST_ASSERT_EQUAL_HEX32(0U, TEST_GPIO_PORT_B->MODER & (0b11U << (2 * 15)));
+
+  // Trying to modify the GPIO Mode of an unlocked pin should work
+  TEST_GPIO_PORT_B->MODER |= (1U << (2 * 7));
+  TEST_ASSERT_EQUAL_HEX32(1U << (2 * 7), TEST_GPIO_PORT_B->MODER & (0b11U << (2 * 7)));
+}
+
 void test_gpio_main() {
+  UnitySetTestFile(__FILE_NAME__);
   printf("\n\nWIRE TEST_GPIO_PIN_A AND TEST_GPIO_PIN_B\n\n");
 
   RUN_TEST(test_unit_GPIO_Init_modes);
@@ -322,4 +349,5 @@ void test_gpio_main() {
   RUN_TEST(test_decoupled_EXTI_interrupt_rising_trigger);
   RUN_TEST(test_decoupled_EXTI_interrupt_falling_trigger);
   RUN_TEST(test_decoupled_EXTI_interrupt_both_trigger);
+  RUN_TEST(test_decoupled_GPIO_LockPort);
 }
