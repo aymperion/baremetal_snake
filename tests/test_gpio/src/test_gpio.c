@@ -1,8 +1,8 @@
+#include "test_gpio.h"
 #include "exti_helper.h"
 #include "gpio_driver.h"
 #include "nvic_helper.h"
 #include "rcc_helper.h"
-#include "test_config.h"
 #include "unity.h"
 #include <stdbool.h>
 #include <stdint.h>
@@ -141,7 +141,8 @@ void test_unit_GPIO_Init_alternate_function(void) {
 void test_decoupled_GPIO_SetPin(void) {
   TEST_GPIO_PORT_A->MODER |= (0x01U << (2 * TEST_GPIO_PIN_A_INDEX));  // Output
   TEST_GPIO_PORT_B->MODER &= ~(0x03U << (2 * TEST_GPIO_PIN_B_INDEX)); // Input
-  TEST_GPIO_PORT_A->BSRR = ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear tested pin
+  TEST_GPIO_PORT_A->BSRR =
+      ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear tested pin
   loopback_delay();
 
   GPIO_SetPin(TEST_GPIO_PORT_A, TEST_GPIO_PIN_A);
@@ -197,7 +198,8 @@ void test_decoupled_GPIO_TogglePin(void) {
   TEST_GPIO_PORT_A->MODER |= (0x01U << (2 * TEST_GPIO_PIN_A_INDEX));  // Output
   TEST_GPIO_PORT_B->MODER &= ~(0x03U << (2 * TEST_GPIO_PIN_B_INDEX)); // Input
 
-  TEST_GPIO_PORT_A->BSRR = ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear tested pin
+  TEST_GPIO_PORT_A->BSRR =
+      ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear tested pin
   loopback_delay();
   TEST_ASSERT_FALSE((TEST_GPIO_PORT_B->IDR & TEST_GPIO_PIN_B) != 0);
 
@@ -214,7 +216,8 @@ void test_decoupled_GPIO_TogglePin(void) {
 
 void test_decoupled_EXTI_interrupt_rising_trigger(void) {
   TEST_GPIO_PORT_A->MODER |= (0x01U << (2 * TEST_GPIO_PIN_A_INDEX)); // Output
-  TEST_GPIO_PORT_A->BSRR = ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear TEST_GPIO_PIN_A
+  TEST_GPIO_PORT_A->BSRR =
+      ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear TEST_GPIO_PIN_A
   loopback_delay();
 
   /* Setting up Rising Trigger interrupt on TEST_GPIO_PORT_B */
@@ -268,7 +271,8 @@ void test_decoupled_EXTI_interrupt_falling_trigger(void) {
 
 void test_decoupled_EXTI_interrupt_both_trigger(void) {
   TEST_GPIO_PORT_A->MODER |= (0x01U << (2 * TEST_GPIO_PIN_A_INDEX)); // Output
-  TEST_GPIO_PORT_A->BSRR = ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear TEST_GPIO_PIN_A
+  TEST_GPIO_PORT_A->BSRR =
+      ((uint32_t)TEST_GPIO_PIN_A << 16); // Clear TEST_GPIO_PIN_A
   loopback_delay();
 
   /* Setting up Falling AND Rising Triggers interrupt on TEST_GPIO_PORT_B */
@@ -301,4 +305,21 @@ void test_decoupled_EXTI_interrupt_both_trigger(void) {
 
   /* Checking if EXTI->PR register was cleared */
   TEST_ASSERT_FALSE((EXTI_GetPending() & (1U << TEST_GPIO_PIN_B_INDEX)) != 0);
+}
+
+void test_gpio_main() {
+  printf("\n\nWIRE TEST_GPIO_PIN_A AND TEST_GPIO_PIN_B\n\n");
+
+  RUN_TEST(test_unit_GPIO_Init_modes);
+  RUN_TEST(test_unit_GPIO_Init_output_type);
+  RUN_TEST(test_unit_GPIO_Init_speed_and_pull);
+  RUN_TEST(test_unit_GPIO_Init_alternate_function);
+
+  RUN_TEST(test_decoupled_GPIO_SetPin);
+  RUN_TEST(test_decoupled_GPIO_ClearPin);
+  RUN_TEST(test_decoupled_GPIO_ReadPin);
+  RUN_TEST(test_decoupled_GPIO_TogglePin);
+  RUN_TEST(test_decoupled_EXTI_interrupt_rising_trigger);
+  RUN_TEST(test_decoupled_EXTI_interrupt_falling_trigger);
+  RUN_TEST(test_decoupled_EXTI_interrupt_both_trigger);
 }

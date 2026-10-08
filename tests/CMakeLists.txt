@@ -1,11 +1,9 @@
-# ----------------------------------------------------
-# GPIO Loopback Test Executable
-# ----------------------------------------------------
 set(testTarget "main")
+
+add_subdirectory(test_gpio)
 
 add_executable(${testTarget}.elf
     src/test_main.c
-    src/test_gpio_loopback.c
 )
 
 set_target_properties(${testTarget}.elf PROPERTIES
@@ -30,6 +28,7 @@ target_link_libraries(${testTarget}.elf
         drivers
         startup
         Unity
+        test_gpio
         compile_warn
         c
         rdimon
