@@ -89,9 +89,12 @@ No debouncing mechanisms were implemented (RC filters or even software guards) b
 #### Wiring diagram
 ![Wiring diagram](docs/images/wiring_diagram.png)
 
+## DEMO
+https://github.com/user-attachments/assets/4f8d238c-83c7-4a39-a019-c08ea2e8ba12
+
 ## ROADMAP
-- [x] **GPIO** driver
-- [x] **NVIC, EXTI and SYSCFG** register access helper functions
+- [x] **GPIO** driver (see [PR #1](https://github.com/aymperion/baremetal_snake/pull/1))
+- [x] **NVIC, EXTI and SYSCFG** register access helper functions (see [PR #1](https://github.com/aymperion/baremetal_snake/pull/1))
 - [ ] **SPI** driver
 - [ ] Increase the **SPI** clock frequency to reduce game state rendering time, as the **MAX7219** supports speeds up to *10 MHz*.
 - [ ] **SYSCLK** register access helper functions
