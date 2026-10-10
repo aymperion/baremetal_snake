@@ -1,4 +1,8 @@
 {
+  "clangd.path": "c:\\Users\\Aymeric\\AppData\\Roaming\\Code\\User\\globalStorage\\llvm-vs-code-extensions.vscode-clangd\\install\\22.1.6\\clangd_22.1.6\\bin\\clangd.exe",
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.ignore": ["*"],
   "cortex-debug.armToolchainPath": "C:\\Program Files\\Arm\\GNU Toolchain mingw-w64-x86_64-arm-none-eabi\\bin",
   "cortex-debug.variableUseNaturalFormat": false,
   
@@ -13,8 +17,18 @@
       "args": [
         "Flash Firmware"
       ],
-      "tooltip": "Flash target",
+      "tooltip": "Flash newest firmware (Auto: production or test)",
       "priority": -2
+    },
+    {
+      "id": "cmake-config-release",
+      "label": "$(package) Release",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Configure : production (Release)"
+      ],
+      "showButton": false
     },
     {
       "id": "cmake-config-debug",
@@ -22,38 +36,47 @@
       "useVsCodeApi": true,
       "command": "workbench.action.tasks.runTask",
       "args": [
-        "Set build variant to Debug"
+        "Configure : production (Debug)"
       ],
-      "tooltip": "Generate the Cmake files for a debug build type",
       "showButton": false
     },
     {
-      "id": "cmake-config-release",
-      "label": "Release",
-      "useVsCodeApi": true,
-      "command": "workbench.action.tasks.runTask",
-      "args": [
-        "Set build variant to Release"
-      ],
-      "showButton": false,
-    },
-    {
       "id": "cmake-config-relwithdebinfo",
-      "label": "Release with Debug Info",
+      "label": "$(package) Release with Debug Info",
       "useVsCodeApi": true,
       "command": "workbench.action.tasks.runTask",
       "args": [
-        "Set build variant to RelWithDebInfo"
+        "Configure : production (RelWithDebInfo)"
       ],
       "showButton": false
     },
     {
       "id": "cmake-config-minsizerel",
-      "label": "Minimise binary size",
+      "label": "$(package) Minimise binary size",
       "useVsCodeApi": true,
       "command": "workbench.action.tasks.runTask",
       "args": [
-        "Set build variant to MinSizeRel"
+        "Configure : production (MinSizeRel)"
+      ],
+      "showButton": false
+    },
+    {
+      "id": "cmake-config-test-release",
+      "label": "$(beaker) Release",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Configure : test (Release)"
+      ],
+      "showButton": false
+    },
+    {
+      "id": "cmake-config-test-debug",
+      "label": "$(beaker) Debug",
+      "useVsCodeApi": true,
+      "command": "workbench.action.tasks.runTask",
+      "args": [
+        "Configure : test (Debug)"
       ],
       "showButton": false
     },
@@ -65,7 +88,7 @@
       "args": [
         "Build firmware"
       ],
-      "tooltip": "Compile main.elf, compute binary size and compile .hex/.bin files",
+      "tooltip": "Compile main.elf, compute binary size and generate .hex/.bin files",
       "priority": -1
     }
   ],
@@ -77,7 +100,9 @@
         "cmake-config-release",
         "cmake-config-debug",
         "cmake-config-relwithdebinfo",
-        "cmake-config-minsizerel"
+        "cmake-config-minsizerel",
+        "cmake-config-test-release",
+        "cmake-config-test-debug"
       ],
       "options": {
         "placeholder": "Select a build variant",

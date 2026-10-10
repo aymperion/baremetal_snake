@@ -15,6 +15,25 @@
                 "samplesPerSecond": 10
             },
             "svdFile": "${workspaceFolder}/STM32F446.svd"
+        },
+        {
+            "name": "Debug STM32F446 (with Semihosting)",
+            "type": "cortex-debug",
+            "request": "launch",
+            "executable": "${workspaceFolder}/build/main.elf",
+            "servertype": "openocd",
+            "configFiles": [
+                "board/st_nucleo_f4.cfg"
+            ],
+            "armToolchainPath": "C:\\Program Files\\Arm\\GNU Toolchain mingw-w64-x86_64-arm-none-eabi\\bin",
+            "postLaunchCommands": [
+                "monitor arm semihosting enable"
+            ],
+            "liveWatch": {
+                "enabled": true,
+                "samplesPerSecond": 10
+            },
+            "svdFile": "${workspaceFolder}/STM32F446.svd"
         }
     ]
 }

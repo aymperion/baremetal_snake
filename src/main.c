@@ -1,5 +1,10 @@
+#include "exti_helper.h"
+#include "gpio_driver.h"
+#include "nvic_helper.h"
+#include "rcc_helper.h"
 #include "stm32f446ze.h"
 #include "utils.h"
+
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -7,9 +12,9 @@
 
 #define MSEC_PER_FRAME 300
 #define APPLE_TOGGLE_RATE 100
-#define LED1_PIN_NUMBER 0
-#define LED2_PIN_NUMBER 7
-#define LED3_PIN_NUMBER 14
+#define LED1_PIN GPIO_PIN_0
+#define LED2_PIN GPIO_PIN_7
+#define LED3_PIN GPIO_PIN_14
 
 void _init() {
   // stub
@@ -107,7 +112,6 @@ void move_snake(const Position new_pos, const bool eat_apple) {
 }
 
 void SPI3_Init() {
-  RCC_APB1ENR |= (1 << 15); // power SPI3 peripheral
 
   // PA4 : NSS pin
   GPIOA->MODER &= ~(0b11 << (2 * 4));   // clear PA4 mode reg
@@ -302,17 +306,16 @@ void Game_Init() {
 }
 
 void SysTick_Init() {
-  *STK_LOAD = 0x3E80;       // 16000 in hexadecimal -> 1 ms @ 16 MHz
-  *STK_VAL = 0x0;           // Clear current value
-  *STK_CTRL |= (0b1U << 0); // enable counter
-  *STK_CTRL |= (0b1U << 1); // enable SysTick exception request
-  *STK_CTRL |= (0b1U << 2); // use CPU clock (16MHz)
+  STK->LOAD = 0x3E80;       // 16000 in hexadecimal -> 1 ms @ 16 MHz
+  STK->VAL = 0x0;           // Clear current value
+  STK->CTRL |= (0b1U << 0); // enable counter
+  STK->CTRL |= (0b1U << 1); // enable SysTick exception request
+  STK->CTRL |= (0b1U << 2); // use CPU clock (16MHz)
 }
 
 void EXTI_Init() {
-  RCC_APB2ENR |= (1U << 14);               // enable SYS_CFG clock
-  *SYSCFG_EXTICR4 |= (0b0011U << (4 * 2)); // PD14 -> EXTI14
-  *SYSCFG_EXTICR4 |= (0b0011U << (4 * 3)); // PD15 -> EXTI15
+  SYSCFG->EXTICR4 |= (0b0011U << (4 * 2)); // PD14 -> EXTI14
+  SYSCFG->EXTICR4 |= (0b0011U << (4 * 3)); // PD15 -> EXTI15
 
   EXTI->RTSR |= (1U << 14); // Rising edge trigger on EXTI14
   EXTI->RTSR |= (1U << 15); // Rising edge trigger on EXTI15
@@ -320,10 +323,10 @@ void EXTI_Init() {
              (1U << 15); // clearing pending interrupts triggered during init
   EXTI->IMR |= (1U << 14) | (1U << 15); // enable EXTI14 and EXTI15
 
-  *NVIC_ISER1 |= (1 << (40 - 32)); // enable EXTI15_10
+  NVIC->ISER[1] |= (1 << (40 - 32)); // enable EXTI15_10
 
-  *SYSCFG_EXTICR2 &= ~(0b1111U << (4 * (6 - 4))); // PA6 -> EXTI6
-  *SYSCFG_EXTICR2 &= ~(0b1111U << (4 * (7 - 4))); // PA7 -> EXTI7
+  SYSCFG->EXTICR2 &= ~(0b1111U << (4 * (6 - 4))); // PA6 -> EXTI6
+  SYSCFG->EXTICR2 &= ~(0b1111U << (4 * (7 - 4))); // PA7 -> EXTI7
 
   EXTI->RTSR |= (1U << 6); // Rising edge trigger on EXTI6
   EXTI->RTSR |= (1U << 7); // Rising edge trigger on EXTI7
@@ -331,12 +334,12 @@ void EXTI_Init() {
              (1U << 7); // clearing pending interrupts triggered during init
   EXTI->IMR |= (1U << 6) | (1U << 7); // enable EXTI14 and EXTI15
 
-  *NVIC_ISER0 |= (1 << (23 - 0)); // enable EXTI9_5
+  NVIC->ISER[0] |= (1 << (23 - 0)); // enable EXTI9_5
 }
 
 void EXTI9_5_IRQHandler() {
   if (next_direction == NONE) {
-    appleRandomSeed = *STK_VAL;
+    appleRandomSeed = STK->VAL;
   }
   if ((EXTI->PR) & (1U << 6)) {
     next_direction = RIGHT; // PA6
@@ -350,7 +353,7 @@ void EXTI9_5_IRQHandler() {
 
 void EXTI15_10_IRQHandler() {
   if (next_direction == NONE) {
-    appleRandomSeed = *STK_VAL;
+    appleRandomSeed = STK->VAL;
   }
   if ((EXTI->PR) & (1U << 14)) {
     next_direction = DOWN;
@@ -373,28 +376,32 @@ void SysTick_Handler() {
 }
 
 int main() {
-  RCC_AHB1ENR |=
-      (1U << 0) | (1U << 1) | (1U << 3); // enable GPIOA, GPIOB and GPIOD
+  RCC_Enable_Clock_GPIOx(GPIOA);
+  RCC_Enable_Clock_GPIOx(GPIOB);
+  RCC_Enable_Clock_GPIOx(GPIOD);
+  RCC_Enable_Clock_SYSCFG();
+  RCC_Enable_Clock_SPI3();
 
-  GPIOB->MODER |= (1 << (2 * LED1_PIN_NUMBER)) | (1 << (2 * LED2_PIN_NUMBER)) |
-                  (1 << (2 * LED3_PIN_NUMBER));
+  GPIO_Init(GPIOB, &(GPIO_Init_t){
+    .Pin_Mask = GPIO_PIN_14,
+    .Mode = GPIO_MODE_OUTPUT
+  });
 
-  GPIOD->MODER &=
-      ~((0b11U << (2 * 14)) | (0b11U << (2 * 15))); // PD14 and PD15 are inputs
+  GPIO_Init(GPIOD, &(GPIO_Init_t){
+    .Pin_Mask = (GPIO_PIN_14 | GPIO_PIN_15),
+    .Mode = GPIO_MODE_ITR_RT,
+    .Pull = GPIO_PULL_DOWN
+  });
 
-  GPIOD->PUPDR &= ~(0b1111U << (2 * 14));
-  GPIOD->PUPDR |=
-      ((0b10U << (2 * 14)) | (0b10U << (2 * 15))); // pull-down on PD14 and PD15
+  GPIO_Init(GPIOA, &(GPIO_Init_t){
+    .Pin_Mask = (GPIO_PIN_6 | GPIO_PIN_7),
+    .Mode = GPIO_MODE_ITR_RT,
+    .Pull = GPIO_PULL_DOWN
+  });
 
-  GPIOA->MODER &=
-      ~((0b11U << (2 * 6)) | (0b11U << (2 * 7))); // PA6 and PA7 are inputs
-
-  GPIOA->PUPDR &= ~(0b1111U << (2 * 6));
-  GPIOA->PUPDR |=
-      ((0b10U << (2 * 6)) | (0b10U << (2 * 7))); // pull-down on PA6 and PA7
+  EXTI_EnableNVIC();
 
   SysTick_Init();
-  EXTI_Init();
   SPI3_Init();
   Game_Init();
 
@@ -417,14 +424,12 @@ int main() {
     }
 
     if (next_frame_flag) {
-      *NVIC_ICER0 |= (1U << (23 - 0));  // disable EXTI9_5
-      *NVIC_ICER1 |= (1U << (40 - 32)); // disable EXTI15_10
-      GPIOB->ODR |= (1 << LED3_PIN_NUMBER);
+      __disable_irq();
+      GPIO_TogglePin(GPIOB, LED3_PIN);
       update_lightmap();
-      GPIOB->ODR &= ~(1 << LED3_PIN_NUMBER);
+      GPIO_TogglePin(GPIOB, LED3_PIN);
       next_frame_flag = false;
-      *NVIC_ISER0 |= (1U << (23 - 0));  // enable EXTI9_5
-      *NVIC_ISER1 |= (1U << (40 - 32)); // enable EXTI15_10
+      __enable_irq();
     }
   }
   return 0;

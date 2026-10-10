@@ -1,7 +1,7 @@
 # Running Snake using an Nucleo-F446ZE and an MAX7219 8*8 dot matrix (Bare-metal)
 
 ## DISCLAIMER 
-*This project is a bare-metal POC for a Snake game running on a Nucleo-F446ZE. The primary goal was to set up a working game without relying on HAL, LL APIs, or an RTOS. Consequently, memory footprint, code quality, and speed optimization were not prioritized in this first version. Improvements are being made and can be found in other branches (e.g., the `gpio-driver` branch).*
+*This project is a bare-metal POC for a Snake game running on a Nucleo-F446ZE. The primary goal was to set up a working game without relying on HAL, LL APIs, or an RTOS. Consequently, memory footprint, code quality, and speed optimization were not prioritized in this first version. Improvements are being made and can be found in other branches (e.g., the `spi-driver` branch).*
 
 ## ARCHITECTURE AND CODE EXPLANATION
 ### Timings & Display Rendering
@@ -89,10 +89,11 @@ No debouncing mechanisms were implemented (RC filters or even software guards) b
 #### Wiring diagram
 ![Wiring diagram](docs/images/wiring_diagram.png)
 
-### Improvements for the next version
-1. **Peripheral Drivers**: Implement dedicated drivers for **GPIO** and **SPI** peripherals to abstract direct register manipulations.
-2. **SPI Optimization**: Increase the **SPI** clock frequency to reduce game state rendering time, as the **MAX7219** supports speeds up to *10 MHz*.
-3. **Register Helpers**: Abstract the register-level setup for **SYSCFG**, **NVIC**, and **EXTI** into helper functions.
-4. **Configuration Header**: Extract game parameters into a configuration header file for the player to modify
-5. Ensure the application compiles and works properly using the **CMake** *Release build preset*.
-6. **Clock Speed**: Investigate increasing the CPU clock frequency ?
+## ROADMAP
+- [x] **GPIO** driver
+- [x] **NVIC, EXTI and SYSCFG** register access helper functions
+- [ ] **SPI** driver
+- [ ] Increase the **SPI** clock frequency to reduce game state rendering time, as the **MAX7219** supports speeds up to *10 MHz*.
+- [ ] **SYSCLK** register access helper functions
+- [ ] **Configuration Header**: Extract game parameters into a configuration header file for the player to modify
+- [ ] Ensure the application compiles and works properly using the **CMake** *Release build preset*

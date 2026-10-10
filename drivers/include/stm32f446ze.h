@@ -1,0 +1,231 @@
+/**
+ * @file stm32f446ze.h
+ * @brief Register structure definitions, peripheral base addresses, and access macros for STM32F446xE.
+ */
+
+#ifndef _STM32F446ZE_H_
+#define _STM32F446ZE_H_
+
+#include <stdint.h>
+
+/** @name Register IO definitions */
+/** @{ */
+#define __I  volatile const // Read Only Register
+#define __O  volatile       // Write Only Register
+#define __IO volatile       // Read-Write Register
+/** @} */
+
+/*
+  Core peripherals registers structs
+ */
+
+typedef struct {
+  __IO uint32_t ISER[8];
+  uint32_t RESERVED0[24];
+  __IO uint32_t ICER[8];
+  uint32_t RESERVED1[24];
+  __IO uint32_t ISPR[8];
+  uint32_t RESERVED2[24];
+  __IO uint32_t ICPR[8];
+  uint32_t RESERVED3[24];
+  __IO uint32_t IABR[8];
+  uint32_t RESERVED4[56];
+  __IO uint32_t IPR[60];
+  uint32_t RESERVED5[644];
+  __O  uint32_t STIR;
+} NVIC_RegDef_t;
+
+typedef struct {
+  __IO uint32_t CTRL;
+  __IO uint32_t LOAD;
+  __IO uint32_t VAL;
+  __I  uint32_t CALIB;
+} STK_RegDef_t;
+
+#define STK_CTRL_ENABLE_Pos 0U
+#define STK_CTRL_ENABLE_Msk (1UL << STK_CTRL_ENABLE_Pos)
+
+#define STK_CTRL_TICKINT_Pos 1U
+#define STK_CTRL_TICKINT_Msk (1UL << STK_CTRL_TICKINT_Pos)
+
+#define STK_CTRL_CLKSOURCE_Pos 2U
+#define STK_CTRL_CLKSOURCE_Msk (1UL << STK_CTRL_CLKSOURCE_Pos)
+
+#define STK_CTRL_COUNTFLAG_Pos 16U
+#define STK_CTRL_COUNTFLAG_Msk (1UL << STK_CTRL_COUNTFLAG_Pos)
+
+/*
+  Chip peripherals registers structs
+ */
+
+typedef struct {
+  __IO uint32_t MODER;
+  __IO uint16_t OTYPER;
+  uint16_t : 16;
+  __IO uint32_t OSPEEDR;
+  __IO uint32_t PUPDR;
+  __I  uint16_t IDR;
+  uint16_t : 16;
+  __IO uint16_t ODR;
+  uint16_t : 16;
+  __O  uint32_t BSRR;
+  __IO uint32_t LCKR; // 32-bit access only
+  __IO uint32_t AFRL;
+  __IO uint32_t AFRH;
+} GPIOx_RegDef_t;
+
+typedef struct {
+  __IO uint32_t CR;
+  __IO uint32_t PLLCFGR;
+  __IO uint32_t CFGR;
+  __IO uint32_t CIR;
+  __IO uint32_t AHB1RSTR;
+  __IO uint32_t AHB2RSTR;
+  __IO uint32_t AHB3RSTR;
+  __I  uint32_t RESERVED1;
+  __IO uint32_t APB1RSTR;
+  __IO uint32_t APB2RSTR;
+  __I  uint32_t RESERVED2[2];
+  __IO uint32_t AHB1ENR;
+  __IO uint32_t AHB2ENR;
+  __IO uint32_t AHB3ENR;
+  __I  uint32_t RESERVED3;
+  __IO uint32_t APB1ENR;
+  __IO uint32_t APB2ENR;
+  __I  uint32_t RESERVED4[2];
+  __IO uint32_t AHB1LPENR;
+  __IO uint32_t AHB2LPENR;
+  __IO uint32_t AHB3LPENR;
+  __I  uint32_t RESERVED5;
+  __IO uint32_t APB1LPENR;
+  __IO uint32_t APB2LPENR;
+  __I  uint32_t RESERVED6[2];
+  __IO uint32_t BDCR;
+  __IO uint32_t CSR;
+  __I  uint32_t RESERVED7[2];
+  __IO uint32_t SSCGR;
+  __IO uint32_t PLLI2SCFGR;
+  __IO uint32_t PLLSAICFGR;
+  __IO uint32_t DCKCFGR;
+  __IO uint32_t CKGATENR;
+  __IO uint32_t DCKCFGR2;
+} RCC_RegDef_t;
+
+typedef struct {
+  __IO uint16_t CR1;
+  uint16_t : 16;
+
+  __IO uint16_t CR2;
+  uint16_t : 16;
+
+  __I  uint16_t SR;
+  uint16_t : 16;
+
+  __IO uint16_t DR;
+  uint16_t : 16;
+
+  __IO uint16_t CRCPR;
+  uint16_t : 16;
+
+  __I  uint16_t RXCRCR;
+  uint16_t : 16;
+
+  __I  uint16_t TXCRCR;
+  uint16_t : 16;
+
+  __IO uint16_t I2SCFGR;
+  uint16_t : 16;
+
+  __IO uint16_t I2SPR;
+} SPIx_RegDef_t;
+
+typedef struct {
+  __IO uint32_t MEMRMP;
+  __IO uint32_t PMC;
+  union {
+    __IO uint32_t EXTICR[4];
+    struct {
+      __IO uint32_t EXTICR1;
+      __IO uint32_t EXTICR2;
+      __IO uint32_t EXTICR3;
+      __IO uint32_t EXTICR4;
+    };
+  };
+  uint32_t RESERVED1[2];
+  __IO uint32_t CMPCR;
+  uint32_t RESERVED2[2];
+  __IO uint32_t CFGR;
+} SYSCFG_RegDef_t;
+
+typedef struct {
+  __IO uint32_t IMR;
+  __IO uint32_t EMR;
+  __IO uint32_t RTSR;
+  __IO uint32_t FTSR;
+  __IO uint32_t SWIER;
+  __IO uint32_t PR;
+
+} EXTI_RegDef_t;
+
+/*
+  Core peripherals adresses
+*/
+
+#define STK_BASE  0xE000E010UL
+#define NVIC_BASE 0xE000E100UL
+
+/*
+  Chip peripherals adresses
+*/
+
+#define SYSCFG_BASE 0x40013800
+
+#define RCC_BASE            0x40023800UL
+#define RCC_AHB1ENR_OFFSET  0x30U
+#define RCC_APB1ENR_OFFSET  0x40U
+#define RCC_APB2ENR_OFFSET  0x44U
+
+#define GPIOA_BASE 0x40020000UL
+#define GPIOB_BASE 0x40020400UL
+#define GPIOC_BASE 0x40020800UL
+#define GPIOD_BASE 0x40020C00UL
+#define GPIOE_BASE 0x40021000UL
+#define GPIOF_BASE 0x40021400UL
+#define GPIOG_BASE 0x40021800UL
+#define GPIOH_BASE 0x40021C00UL
+#define GPIO_PORT_TO_INDEX(GPIOx)                                              \
+  ((uint8_t)(((uint32_t)(uintptr_t)(GPIOx) - GPIOA_BASE) >> 10U))
+
+#define SPI3_BASE 0x40003C00UL
+
+#define EXTI_BASE 0x40013C00UL
+
+/*
+  Core peripherals definition
+ */
+
+#define STK  ((STK_RegDef_t *)(STK_BASE))
+#define NVIC ((NVIC_RegDef_t *)NVIC_BASE)
+
+/*
+  Chip peripherals definition
+ */
+
+#define GPIOA  ((GPIOx_RegDef_t *)GPIOA_BASE)
+#define GPIOB  ((GPIOx_RegDef_t *)GPIOB_BASE)
+#define GPIOC  ((GPIOx_RegDef_t *)GPIOC_BASE)
+#define GPIOD  ((GPIOx_RegDef_t *)GPIOD_BASE)
+#define GPIOE  ((GPIOx_RegDef_t *)GPIOE_BASE)
+#define GPIOF  ((GPIOx_RegDef_t *)GPIOF_BASE)
+#define GPIOG  ((GPIOx_RegDef_t *)GPIOG_BASE)
+#define GPIOH  ((GPIOx_RegDef_t *)GPIOH_BASE)
+
+#define SYSCFG ((SYSCFG_RegDef_t *)SYSCFG_BASE)
+
+#define RCC    ((RCC_RegDef_t *)RCC_BASE)
+
+#define EXTI   ((EXTI_RegDef_t *)EXTI_BASE)
+
+#define SPI3   ((SPIx_RegDef_t *)SPI3_BASE)
+
+#endif // _STM32F446ZE_H_
