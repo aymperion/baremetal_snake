@@ -11,8 +11,11 @@
 #include "stm32f446ze.h"
 #include <stdint.h>
 
-/** @brief Bit position of SPI3 enable/reset in RCC APB1 registers. */
+/** @brief Bit position of SPIx enable/reset in RCC buses registers. */
+#define SPI1_BIT_OFFSET 12U
+#define SPI2_BIT_OFFSET 14U
 #define SPI3_BIT_OFFSET 15U
+#define SPI4_BIT_OFFSET 13U
 
 /** @brief Bit position of SYSCFG enable/reset in RCC APB2 registers. */
 #define SYSCFG_BIT_OFFSET 14U
@@ -31,10 +34,10 @@
 void RCC_Enable_Clock_GPIOx(GPIOx_RegDef_t *GPIOx);
 
 /**
- * @brief Enables the APB1 peripheral clock for SPI3.
- * @details Performs a dummy read on APB1ENR to guarantee clock stabilization.
+ * @brief Enables the peripheral clock on the relevant bus for SPIx.
+ * @details Performs a dummy read on the relevant bus to guarantee clock stabilization.
  */
-void RCC_Enable_Clock_SPI3(void);
+void RCC_Enable_Clock_SPIx(const SPIx_RegDef_t *SPIx);
 
 /**
  * @brief Enables the APB2 peripheral clock for the System Configuration Controller (SYSCFG).
@@ -55,9 +58,9 @@ void RCC_Enable_Clock_SYSCFG(void);
 void RCC_Disable_Clock_GPIOx(GPIOx_RegDef_t *GPIOx);
 
 /**
- * @brief Disables the APB1 peripheral clock for SPI3.
+ * @brief Disables the peripheral clock for SPIx on the relevant bus.
  */
-void RCC_Disable_Clock_SPI3(void);
+void RCC_Disable_Clock_SPIx(const SPIx_RegDef_t *SPIx);
 
 /**
  * @brief Disables the APB2 peripheral clock for SYSCFG.
@@ -78,10 +81,10 @@ void RCC_Disable_Clock_SYSCFG(void);
 void RCC_Reset_GPIOx(GPIOx_RegDef_t *GPIOx);
 
 /**
- * @brief Performs a software reset of SPI3.
- * @details Sets and then clears the corresponding reset bit in the APB1RSTR register.
+ * @brief Performs a software reset of SPIx.
+ * @details Sets and then clears the corresponding reset bit.
  */
-void RCC_Reset_SPI3(void);
+void RCC_Reset_Clock_SPIx(const SPIx_RegDef_t *SPIx);
 
 /**
  * @brief Performs a software reset of SYSCFG.
