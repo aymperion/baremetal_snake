@@ -9,6 +9,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+extern void (*g_current_suite_setUp)(void);
+extern void (*g_current_suite_tearDown)(void);
+
 static volatile uint32_t exti_trigger_count = 0;
 
 static inline void loopback_delay(void) {
@@ -34,7 +37,7 @@ void EXTI2_IRQHandler(void) { handle_exti_irq(2); }
 void EXTI3_IRQHandler(void) { handle_exti_irq(3); }
 void EXTI4_IRQHandler(void) { handle_exti_irq(4); }
 
-void setUp(void) {
+static void setUp_GPIO(void) {
   exti_trigger_count = 0;
 
   RCC_Enable_Clock_GPIOx(TEST_GPIO_PORT_A);
@@ -51,7 +54,7 @@ void setUp(void) {
   loopback_delay();
 }
 
-void tearDown(void) {
+static void tearDown_GPIO(void) {
   EXTI_DisableNVIC();
   EXTI_ClearPending(TEST_GPIO_PIN_B_INDEX);
 
@@ -334,6 +337,10 @@ void test_decoupled_GPIO_LockPort() {
 }
 
 void test_gpio_main() {
+
+  g_current_suite_setUp = setUp_GPIO;
+  g_current_suite_tearDown = tearDown_GPIO;
+
   UnitySetTestFile(__FILE_NAME__);
   printf("\n\nWIRE TEST_GPIO_PIN_A AND TEST_GPIO_PIN_B\n\n");
 

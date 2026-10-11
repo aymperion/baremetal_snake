@@ -1,6 +1,7 @@
 set(testTarget "main")
 
 add_subdirectory(test_gpio)
+add_subdirectory(test_spi)
 
 add_executable(${testTarget}.elf
     src/test_main.c
@@ -29,6 +30,7 @@ target_link_libraries(${testTarget}.elf
         startup
         Unity
         test_gpio
+        test_spi
         compile_warn
         c
         rdimon
