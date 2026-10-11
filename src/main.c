@@ -2,6 +2,7 @@
 #include "gpio_driver.h"
 #include "nvic_helper.h"
 #include "rcc_helper.h"
+#include "spi_driver.h"
 #include "stm32f446ze.h"
 #include "utils.h"
 
@@ -109,57 +110,6 @@ void move_snake(const Position new_pos, const bool eat_apple) {
     // after apple eaten, snake is 1 unit longer, tail pos doesn't change
     tail_idx = (tail_idx + 1) % MAX_SNAKE_SIZE;
   }
-}
-
-void SPI3_Init() {
-
-  // PA4 : NSS pin
-  GPIOA->MODER &= ~(0b11 << (2 * 4));   // clear PA4 mode reg
-  GPIOA->MODER |= (0b01 << (2 * 4));    // set PA4 mode as output
-  GPIOA->OTYPER &= ~(1 << 4);           // set PA4 output type to push-pull
-  GPIOA->OSPEEDR &= ~(0b11 << (2 * 4)); // clear PA4 OSPEEDR reg
-  GPIOA->OSPEEDR |= (0b11 << (2 * 4));  // set PA4 output speed to high
-  GPIOA->PUPDR &= ~(0b11 << (2 * 4));   // clear PA4 PUPDR reg
-  GPIOA->PUPDR |= (0b10 << (2 * 4));    // set PA4 pull-down
-  GPIOA->ODR |= (0b1 << 4);             // set PA4 bit
-
-  GPIOA->MODER &= ~(0b11U << (2 * 15));   // clear PA15 mode reg
-  GPIOA->MODER |= (0b01U << (2 * 15));    // set PA15 mode as output
-  GPIOA->OTYPER |= (1U << 15);            // set PA15 output type to open-drain
-  GPIOA->OSPEEDR &= ~(0b11U << (2 * 15)); // clear PA15 OSPEEDR reg
-  GPIOA->OSPEEDR |= (0b11U << (2 * 15));  // set PA15 output speed to high
-  GPIOA->PUPDR &=
-      ~(0b11U << (2 * 15)); // clear PA15 PUPDR reg, set PA15 without PU or PD
-  GPIOA->ODR |= (1U << 15); // set PA15 output value
-
-  GPIOB->MODER &= ~(0b11 << (2 * 3));  // clear PB3 mode reg
-  GPIOB->MODER |= (0b10 << (2 * 3));   // set PB3 mode as AF
-  GPIOB->AFRL &= ~(0b1111 << (4 * 3)); // clear PB3 AFLR
-  GPIOB->AFRL |= (0b0110 << (4 * 3));  // set PB3 AF as AF6
-
-  GPIOB->MODER &= ~(0b11 << (2 * 4));  // clear PB4 mode reg
-  GPIOB->MODER |= (0b10 << (2 * 4));   // set PB4 mode as AF
-  GPIOB->AFRL &= ~(0b1111 << (4 * 4)); // clear PB4 AFLR
-  GPIOB->AFRL |= (0b0110 << (4 * 4));  // set PB4 AF as AF6
-
-  GPIOB->MODER &= ~(0b11 << (2 * 5));  // clear PB5 mode reg
-  GPIOB->MODER |= (0b10 << (2 * 5));   // set PB5 mode as AF
-  GPIOB->AFRL &= ~(0b1111 << (4 * 5)); // clear PB5 AFLR
-  GPIOB->AFRL |= (0b0110 << (4 * 5));  // set PB5 AF as AF6
-
-  SPI3->CR1 |= (0b111 << 3);            // baud rate = fPCLK/256
-  SPI3->CR1 &= ~((1 << 0) | (1 << 1));  // CPHA = 0, CPOL = 0
-  SPI3->CR1 |= ((1 << 14) | (1 << 15)); // Simplex transmit-only
-  SPI3->CR1 |= (1 << 2);                // Master configuration
-  SPI3->CR1 &= ~(1 << 7);               // MSB first
-  SPI3->CR1 &= ~(1 << 13);              // CRC disabled
-  SPI3->CR1 |= (1 << 9) | (1 << 8);     // SSM = 1 and SSI = 1
-  SPI3->CR1 |= (1 << 2);                // Master configuration
-  SPI3->CR1 |= (1 << 11);               // 16-bits frame format
-  SPI3->CR2 &= ~(1 << 2);               // disable SS output
-  SPI3->CR2 &= ~(1 << 7);               // mask TXE interrupt
-
-  SPI3->CR1 |= (1 << 6); // enable SPI3
 }
 
 void SPI_Transmit(const uint16_t *data) {
@@ -380,7 +330,7 @@ int main() {
   RCC_Enable_Clock_GPIOx(GPIOB);
   RCC_Enable_Clock_GPIOx(GPIOD);
   RCC_Enable_Clock_SYSCFG();
-  RCC_Enable_Clock_SPI3();
+  RCC_Enable_Clock_SPIx(SPI3);
 
   GPIO_Init(GPIOB, &(GPIO_Init_t){
     .Pin_Mask = GPIO_PIN_14,
@@ -402,7 +352,37 @@ int main() {
   EXTI_EnableNVIC();
 
   SysTick_Init();
-  SPI3_Init();
+
+  /* Configuration of CS / LOAD pin (PA4) */
+  GPIO_Init(GPIOA, &(GPIO_Init_t){
+    .Pin_Mask = GPIO_PIN_4,
+    .Mode = GPIO_MODE_OUTPUT,
+    .Output_Type = GPIO_OTYPE_PUSHPULL,
+    .Output_Speed = GPIO_OSPEED_HIGH,
+    .Pull = GPIO_PULL_DOWN
+  });
+  GPIO_SetPin(GPIOA, GPIO_PIN_4);
+
+  /* Configuration of SPI3 pins : PB3 (SCK), PB4 (MISO), PB5 (MOSI) in AF6 */
+  GPIO_Init(GPIOB, &(GPIO_Init_t){
+    .Pin_Mask = GPIO_PIN_3 | GPIO_PIN_4 | GPIO_PIN_5,
+    .Mode = GPIO_MODE_ALTFN,
+    .Alternate_Func = GPIO_ALTFN_6,
+    .Output_Speed = GPIO_OSPEED_HIGH
+  });
+
+  /* Configuration of SPI3 peripheral */
+  SPI_Init(SPI3, &(SPI_Init_t){
+    .Mode = SPI_MODE_MASTER,
+    .Direction = SPI_DIRECTION_1LINE,
+    .DataSize = SPI_DATASIZE_16BIT,
+    .CPOL = SPI_CPOL_LOW,
+    .CPHA = SPI_CPHA_1EDGE,
+    .BaudRate = SPI_BAUDRATE_DIV256,
+    .FirstBit = SPI_FIRSTBIT_MSB
+  });
+  SPI_Enable(SPI3);
+
   Game_Init();
 
   while (!(next_direction & last_direction)) {
