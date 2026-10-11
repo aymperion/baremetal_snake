@@ -2,6 +2,7 @@ add_library(drivers STATIC
     src/exti_helper.c
     src/gpio_driver.c
     src/rcc_helper.c
+    src/spi_driver.c
 )
 
 target_include_directories(drivers PUBLIC
