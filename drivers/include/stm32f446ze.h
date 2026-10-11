@@ -139,6 +139,25 @@ typedef struct {
   __IO uint16_t I2SPR;
 } SPIx_RegDef_t;
 
+#define SPI_CR1_CPHA_Pos      0U
+#define SPI_CR1_CPOL_Pos      1U
+#define SPI_CR1_MSTR_Pos      2U
+#define SPI_CR1_BR_Pos        3U
+#define SPI_CR1_SPE_Pos       6U
+#define SPI_CR1_LSBFIRST_Pos  7U
+#define SPI_CR1_SSI_Pos       8U
+#define SPI_CR1_SSM_Pos       9U
+#define SPI_CR1_RXONLY_Pos    10U
+#define SPI_CR1_DFF_Pos       11U
+#define SPI_CR1_CRCNEXT_Pos   12U
+#define SPI_CR1_CRCEN_Pos     13U
+#define SPI_CR1_BIDIOE_Pos    14U
+#define SPI_CR1_BIDIMODE_Pos  15U
+
+#define SPI_SR_RXNE_Pos       0U
+#define SPI_SR_TXE_Pos        1U
+#define SPI_SR_BSY_Pos        7U
+
 typedef struct {
   __IO uint32_t MEMRMP;
   __IO uint32_t PMC;
@@ -196,7 +215,10 @@ typedef struct {
 #define GPIO_PORT_TO_INDEX(GPIOx)                                              \
   ((uint8_t)(((uint32_t)(uintptr_t)(GPIOx) - GPIOA_BASE) >> 10U))
 
+#define SPI1_BASE 0x40013000UL
+#define SPI2_BASE 0x40003800UL
 #define SPI3_BASE 0x40003C00UL
+#define SPI4_BASE 0x40013400UL
 
 #define EXTI_BASE 0x40013C00UL
 
@@ -226,6 +248,9 @@ typedef struct {
 
 #define EXTI   ((EXTI_RegDef_t *)EXTI_BASE)
 
+#define SPI1   ((SPIx_RegDef_t *)SPI1_BASE)
+#define SPI2   ((SPIx_RegDef_t *)SPI2_BASE)
 #define SPI3   ((SPIx_RegDef_t *)SPI3_BASE)
+#define SPI4   ((SPIx_RegDef_t *)SPI4_BASE)
 
 #endif // _STM32F446ZE_H_
