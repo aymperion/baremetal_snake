@@ -3,6 +3,7 @@
 
 #include "stm32f446ze.h"
 #include "stdbool.h"
+#include <stddef.h>
 
 typedef enum {
   SPI_MODE_SLAVE,
@@ -56,8 +57,16 @@ typedef struct {
   SPI_FirstBit_t   FirstBit;
 } SPI_Init_t;
 
+typedef enum {
+  SPI_OK = 0,
+  SPI_ERR_PARAM   = -1,
+  SPI_ERR_TIMEOUT = -2
+} SPI_ReturnCode_t;
+
 void SPI_Init(SPIx_RegDef_t *p_spi, const SPI_Init_t *p_config);
 void SPI_Enable(SPIx_RegDef_t *p_spi);
 void SPI_Disable(SPIx_RegDef_t *p_spi);
+
+SPI_ReturnCode_t SPI_TransmitReceive(SPIx_RegDef_t *p_spi, const void *p_TX_data, void *p_RX_data, size_t len_bytes, size_t timeout_ms);
 
 #endif // _SPI_DRIVER_H_
